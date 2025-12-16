@@ -1,0 +1,834 @@
+<div id="mc-cost-estimator">
+  <style>
+    #mc-cost-estimator {
+      --mc-sticky-offset: 88px;
+      font-family: "Transducer", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1f2937;
+      background: #f7f8fb;
+      padding: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    #mc-cost-estimator .mc-shell {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(26, 26, 46, 0.12);
+      padding: 32px;
+    }
+
+    #mc-cost-estimator .mc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    #mc-cost-estimator .mc-title {
+      margin: 0;
+      font-size: 28px;
+      color: #0f172a;
+      letter-spacing: -0.01em;
+    }
+
+    #mc-cost-estimator .mc-subtitle {
+      margin: 4px 0 0;
+      color: #475569;
+      font-size: 18px;
+    }
+
+    #mc-cost-estimator .mc-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    #mc-cost-estimator .mc-panel {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      background: #fff;
+    }
+
+    #mc-cost-estimator .mc-panel.mc-sticky {
+      position: static;
+    }
+
+    #mc-cost-estimator .mc-panel-title {
+      margin: 0 0 12px;
+      font-size: 20px;
+      color: #0f172a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #mc-cost-estimator .mc-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    #mc-cost-estimator .mc-label {
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 18px;
+    }
+
+    #mc-cost-estimator .mc-helper {
+      font-size: 15px;
+      color: #6b7280;
+    }
+
+    #mc-cost-estimator .mc-options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    #mc-cost-estimator .mc-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+      position: relative;
+    }
+
+    #mc-cost-estimator .mc-card:hover {
+      border-color: #1a1a2e;
+      box-shadow: 0 6px 18px rgba(26, 26, 46, 0.08);
+      transform: translateY(-2px);
+    }
+
+    #mc-cost-estimator .mc-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #mc-cost-estimator .mc-card .mc-card-title {
+      font-weight: 700;
+      margin: 0 0 4px;
+      color: #0f172a;
+    }
+
+    #mc-cost-estimator .mc-card .mc-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 16px;
+      color: #475569;
+    }
+
+    #mc-cost-estimator .mc-card .mc-rate {
+      margin-top: 6px;
+      color: #1a1a2e;
+      font-weight: 700;
+    }
+
+    #mc-cost-estimator .mc-card.selected {
+      border-color: #1a1a2e;
+      background: #e8ecf7;
+      box-shadow: 0 8px 24px rgba(26, 26, 46, 0.12);
+    }
+
+    #mc-cost-estimator .mc-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    #mc-cost-estimator select,
+    #mc-cost-estimator input[type="number"],
+    #mc-cost-estimator input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      font-size: 18px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-sizing: border-box;
+    }
+
+    #mc-cost-estimator select:focus,
+    #mc-cost-estimator input[type="number"]:focus {
+      border-color: #1a1a2e;
+      box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.12);
+      outline: none;
+    }
+
+    #mc-cost-estimator .mc-slider-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #mc-cost-estimator .mc-slider-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: #f9fafb;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    #mc-cost-estimator .mc-slider-display .mc-discount-badge {
+      color: #286140;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    #mc-cost-estimator input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    #mc-cost-estimator input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #286140;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(40, 97, 64, 0.3);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    #mc-cost-estimator input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 3px 8px rgba(40, 97, 64, 0.4);
+    }
+
+    #mc-cost-estimator input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #286140;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 6px rgba(40, 97, 64, 0.3);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    #mc-cost-estimator input[type="range"]::-moz-range-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 3px 8px rgba(40, 97, 64, 0.4);
+    }
+
+    #mc-cost-estimator input[type="range"]:focus {
+      outline: none;
+    }
+
+    #mc-cost-estimator input[type="range"]:focus::-webkit-slider-thumb {
+      box-shadow: 0 0 0 3px rgba(40, 97, 64, 0.2), 0 2px 6px rgba(40, 97, 64, 0.3);
+    }
+
+    #mc-cost-estimator input[type="range"]:focus::-moz-range-thumb {
+      box-shadow: 0 0 0 3px rgba(40, 97, 64, 0.2), 0 2px 6px rgba(40, 97, 64, 0.3);
+    }
+
+    #mc-cost-estimator .mc-checkboxes {
+      display: grid;
+      gap: 8px;
+    }
+
+    #mc-cost-estimator .mc-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #f9fafb;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    #mc-cost-estimator .mc-checkbox input {
+      margin-top: 2px;
+      accent-color: #1a1a2e;
+    }
+
+    #mc-cost-estimator .mc-checkbox label {
+      font-size: 18px;
+      color: #1f2937;
+      cursor: pointer;
+    }
+
+    #mc-cost-estimator .mc-summary {
+      background: #314254;
+      color: #f8fafc;
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    #mc-cost-estimator .mc-summary h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      letter-spacing: 0.01em;
+    }
+
+    #mc-cost-estimator .mc-line {
+      border: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      margin: 10px 0;
+    }
+
+    #mc-cost-estimator .mc-summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 18px;
+      margin: 6px 0;
+      color: #e2e8f0;
+    }
+
+    #mc-cost-estimator .mc-summary-row strong {
+      color: #fff;
+    }
+
+    #mc-cost-estimator .mc-total {
+      font-size: 22px;
+      font-weight: 800;
+      color: #286140;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 12px 0 4px;
+    }
+
+    #mc-cost-estimator .mc-note {
+      font-size: 15px;
+      color: #cbd5e1;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    #mc-cost-estimator .mc-warning {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 6px;
+    }
+
+    #mc-cost-estimator .mc-actions {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #mc-cost-estimator .mc-btn {
+      background: linear-gradient(135deg, #286140, #3b8b59);
+      color: #f8fafc;
+      border: none;
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      box-shadow: 0 10px 25px rgba(40, 97, 64, 0.28);
+    }
+
+    #mc-cost-estimator .mc-btn:hover:enabled {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(40, 97, 64, 0.35);
+    }
+    #mc-cost-estimator .mc-geo-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      position: relative;
+    }
+
+    #mc-cost-estimator .mc-geo-btn {
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #286140;
+      background: #eff6f3;
+      color: #1f2937;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      white-space: nowrap;
+    }
+
+    #mc-cost-estimator .mc-geo-btn:hover {
+      border-color: #3b8b59;
+      box-shadow: 0 6px 16px rgba(40, 97, 64, 0.18);
+    }
+
+    #mc-cost-estimator .mc-geo-status {
+      font-size: 15px;
+      color: #1f2937;
+      margin-top: 6px;
+      min-height: 16px;
+    }
+
+    #mc-cost-estimator .mc-loc-results {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+      z-index: 10;
+      max-height: 220px;
+      overflow: auto;
+      display: none;
+    }
+
+    #mc-cost-estimator .mc-loc-item {
+      padding: 12px 14px;
+      cursor: pointer;
+      font-size: 18px;
+      color: #111827;
+    }
+
+    #mc-cost-estimator .mc-loc-item:hover {
+      background: #f5f5f5;
+    }
+
+
+    #mc-cost-estimator .mc-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      box-shadow: none;
+    }
+
+    #mc-cost-estimator .mc-secondary {
+      font-size: 16px;
+      color: #e2e8f0;
+      text-align: center;
+    }
+
+    #mc-cost-estimator .mc-secondary a {
+      color: #fbbf24;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    #mc-cost-estimator .mc-pulse {
+      animation: mcPulse 0.45s ease;
+    }
+
+    @keyframes mcPulse {
+      0% { box-shadow: 0 0 0 0 rgba(40, 97, 64, 0.55); }
+      100% { box-shadow: 0 0 0 16px rgba(40, 97, 64, 0); }
+    }
+
+    @media (min-width: 768px) {
+      #mc-cost-estimator .mc-layout {
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+
+      #mc-cost-estimator .mc-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      #mc-cost-estimator .mc-panel.mc-sticky {
+        position: sticky;
+        top: var(--mc-sticky-offset, 88px);
+        align-self: start;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      #mc-cost-estimator {
+        padding: 40px;
+      }
+
+      #mc-cost-estimator .mc-shell {
+        padding: 40px;
+      }
+    }
+  </style>
+
+  <div class="mc-shell" aria-live="polite">
+    <div class="mc-header">
+      <div>
+        <h2 class="mc-title">Mobile Kitchen Cost Estimator</h2>
+        <p class="mc-subtitle">Get an instant ballpark before requesting a formal quote.</p>
+      </div>
+    </div>
+
+    <div class="mc-layout">
+      <div class="mc-panel" aria-labelledby="mc-inputs-title">
+        <h3 id="mc-inputs-title" class="mc-panel-title">Project Details</h3>
+
+        <div class="mc-input-group" role="radiogroup" aria-labelledby="mc-kitchen-label">
+          <span id="mc-kitchen-label" class="mc-label">Kitchen Size*</span>
+          <div class="mc-helper">Choose a mobile kitchen model.</div>
+          <div id="mc-model-options" class="mc-options"></div>
+        </div>
+
+        <div class="mc-grid-2">
+          <div class="mc-input-group">
+            <label class="mc-label" for="mc-duration">Rental Duration*</label>
+            <div class="mc-slider-wrapper">
+              <div class="mc-slider-display">
+                <span id="mc-duration-display">1 month</span>
+                <span id="mc-duration-discount" class="mc-discount-badge"></span>
+              </div>
+              <input type="range" id="mc-duration" name="duration" min="1" max="24" value="1" step="1" aria-required="true" aria-label="Rental duration in months" />
+            </div>
+            <div class="mc-helper">Drag to select duration. Discounts apply at 3, 6, and 12+ months.</div>
+          </div>
+
+          <div class="mc-input-group">
+            <label class="mc-label" for="mc-location">Location (city/state)*</label>
+            <div class="mc-geo-row">
+              <input id="mc-location" name="location" placeholder="Start typing your city/state" aria-required="true" autocomplete="off" />
+              <button type="button" id="mc-geo-btn" class="mc-geo-btn">Use my location</button>
+              <div id="mc-location-results" class="mc-loc-results" role="listbox" aria-label="Location suggestions"></div>
+            </div>
+            <div class="mc-helper">Type to search U.S. locations; miles to Portland, OR calculate automatically.</div>
+            <div id="mc-geo-status" class="mc-geo-status" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="mc-grid-2">
+          <div class="mc-input-group">
+            <span class="mc-label">Add-ons (monthly)</span>
+            <div id="mc-addons" class="mc-checkboxes"></div>
+          </div>
+
+          <div class="mc-input-group">
+            <span class="mc-label">One-time Services</span>
+            <div id="mc-services" class="mc-checkboxes"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mc-panel mc-sticky">
+        <div class="mc-summary" aria-live="polite">
+          <h3>Estimate Summary</h3>
+          <div id="mc-summary-body">
+            <p style="margin:0;color:#e2e8f0;">Select a kitchen size, duration, and delivery distance to see your estimate.</p>
+          </div>
+
+          <div class="mc-actions">
+            <button id="mc-cta" class="mc-btn" type="button" disabled aria-disabled="true">Request Formal Quote</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const ORIGIN = { lat: 45.5152, lon: -122.6784 }; // Portland, OR
+      const data = {
+        models: [
+          { id: "30", name: "30' Mobile Kitchen", rate: 10000, dimensions: "30' x 8'", capacity: "150-200 meals", sqft: "240 SF" },
+          { id: "40", name: "40' Mobile Kitchen", rate: 15000, dimensions: "40' x 8'", capacity: "200-250 meals", sqft: "320 SF" },
+          { id: "53", name: "53' Mobile Kitchen", rate: 20000, dimensions: "53' x 8'6\"", capacity: "300-450 meals", sqft: "450 SF" },
+          { id: "2x53", name: "2x53' Mobile Kitchen", rate: 30000, dimensions: "53' x 17'", capacity: "500-650 meals", sqft: "900 SF" },
+        ],
+        durations: [1, 2, 3, 6, 12, 18, 24],
+        addOns: [
+          { id: "generator", label: "Generator package", monthly: 2500 },
+          { id: "equipment", label: "Extended equipment package", monthly: 1500 },
+          { id: "hvac", label: "Additional HVAC unit", monthly: 800 },
+          { id: "water", label: "Water tank upgrade (500 gal)", monthly: 400 },
+        ],
+        services: [
+          { id: "utility", label: "Utility connection support", oneTime: 1500 },
+          { id: "permit", label: "Permit assistance", oneTime: 750 },
+        ],
+      };
+
+      const els = {
+        modelOptions: document.getElementById("mc-model-options"),
+        duration: document.getElementById("mc-duration"),
+        durationDisplay: document.getElementById("mc-duration-display"),
+        durationDiscount: document.getElementById("mc-duration-discount"),
+        location: document.getElementById("mc-location"),
+        locationResults: document.getElementById("mc-location-results"),
+        geoBtn: document.getElementById("mc-geo-btn"),
+        geoStatus: document.getElementById("mc-geo-status"),
+        addOns: document.getElementById("mc-addons"),
+        services: document.getElementById("mc-services"),
+        summaryBody: document.getElementById("mc-summary-body"),
+        cta: document.getElementById("mc-cta"),
+      };
+
+      const state = {
+        modelId: null,
+        months: null,
+        distance: null,
+        locationName: "",
+        addOns: new Set(),
+        services: new Set(),
+        lastTotal: null,
+        locationResults: [],
+        locFetchId: 0,
+      };
+
+      const fmt = (n) => "$" + Math.round(n).toLocaleString("en-US");
+      const discount = (m) => (m >= 12 ? 0.15 : m >= 6 ? 0.1 : m >= 3 ? 0.05 : 0);
+      const milesBetween = (a, b, c, d) => {
+        const R = 3958.8, toRad = (x) => (x * Math.PI) / 180;
+        const dLat = toRad(c - a), dLon = toRad(d - b);
+        const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a)) * Math.cos(toRad(c)) * Math.sin(dLon / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s));
+      };
+
+      function renderModels() {
+        els.modelOptions.innerHTML = data.models.map((m) => `
+          <label class="mc-card" tabindex="0" role="radio" aria-checked="false" for="mc-model-${m.id}">
+            <input type="radio" name="mc-model" id="mc-model-${m.id}" value="${m.id}" />
+            <div class="mc-card-title">${m.name}</div>
+            <div class="mc-card-meta"><span>${m.capacity}</span><span>• ${m.dimensions}</span><span>• ${m.sqft}</span></div>
+            <div class="mc-rate">${fmt(m.rate)}/month</div>
+          </label>
+        `).join("");
+        els.modelOptions.querySelectorAll(".mc-card").forEach((card) => {
+          const id = card.querySelector("input").value;
+          const select = () => {
+            state.modelId = id;
+            els.modelOptions.querySelectorAll(".mc-card").forEach((c) => {
+              const active = c.querySelector("input").value === id;
+              c.classList.toggle("selected", active);
+              c.setAttribute("aria-checked", active ? "true" : "false");
+              c.querySelector("input").checked = active;
+            });
+            update();
+          };
+          card.addEventListener("click", select);
+          card.addEventListener("keypress", (e) => {
+            if (e.key === " " || e.key === "Enter") {
+              e.preventDefault();
+              select();
+            }
+          });
+        });
+      }
+
+      function updateDurationDisplay(months) {
+        const d = discount(months);
+        els.durationDisplay.textContent = `${months} month${months > 1 ? "s" : ""}`;
+        els.durationDiscount.textContent = d ? `${Math.round(d * 100)}% off` : "";
+      }
+
+      function renderCheckGroup(list, target, key, suffix) {
+        list.forEach((item) => {
+          const wrap = document.createElement("div");
+          wrap.className = "mc-checkbox";
+          wrap.innerHTML = `<input type="checkbox" id="${key}-${item.id}" value="${item.id}" /><label for="${key}-${item.id}">${item.label} (+${fmt(item[suffix])}${suffix === "monthly" ? "/mo" : ""})</label>`;
+          wrap.querySelector("input").addEventListener("change", (e) => {
+            const set = state[key];
+            e.target.checked ? set.add(item.id) : set.delete(item.id);
+            update();
+          });
+          target.appendChild(wrap);
+        });
+      }
+
+      function renderLocationResults(list) {
+        if (!list.length) return (els.locationResults.style.display = "none", els.locationResults.innerHTML = "");
+        els.locationResults.innerHTML = list.map((loc, idx) => `<div class="mc-loc-item" role="option" data-idx="${idx}">${loc.display_name}</div>`).join("");
+        els.locationResults.style.display = "block";
+        els.locationResults.querySelectorAll(".mc-loc-item").forEach((item) => {
+          item.addEventListener("click", () => selectLocation(+item.dataset.idx));
+        });
+      }
+
+      function selectLocation(idx) {
+        const loc = state.locationResults[idx];
+        if (!loc) return;
+        const miles = milesBetween(+loc.lat, +loc.lon, ORIGIN.lat, ORIGIN.lon);
+        state.locationName = loc.display_name;
+        state.distance = Math.max(0, Math.min(3000, Math.round(miles)));
+        els.location.value = loc.display_name;
+        els.geoStatus.textContent = `${state.distance} miles from Portland, OR.`;
+        els.locationResults.style.display = "none";
+        update();
+      }
+
+      function searchLocations(term) {
+        const q = term.trim();
+        if (q.length < 2) return renderLocationResults((state.locationResults = []));
+        const fetchId = ++state.locFetchId;
+        fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=us&limit=6&q=${encodeURIComponent(q)}`, {
+          headers: { Accept: "application/json" },
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            if (fetchId !== state.locFetchId) return;
+            state.locationResults = Array.isArray(data) ? data : [];
+            renderLocationResults(state.locationResults);
+          })
+          .catch(() => {
+            if (fetchId !== state.locFetchId) return;
+            state.locationResults = [];
+            renderLocationResults([]);
+            els.geoStatus.textContent = "Could not fetch locations. Try again.";
+          });
+      }
+
+      function geolocate() {
+        if (!navigator.geolocation) return (els.geoStatus.textContent = "Geolocation not supported. Please enter miles manually.");
+        els.geoStatus.textContent = "Calculating distance...";
+        navigator.geolocation.getCurrentPosition(
+          ({ coords }) => {
+            const miles = Math.round(milesBetween(coords.latitude, coords.longitude, ORIGIN.lat, ORIGIN.lon));
+            state.locationName = "Your current location";
+            state.distance = miles;
+            els.location.value = "Your current location";
+            els.geoStatus.textContent = `Approx. ${miles} miles from Portland, OR.`;
+            els.locationResults.style.display = "none";
+            update();
+          },
+          () => (els.geoStatus.textContent = "Unable to get location. Please enter miles manually."),
+          { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+        );
+      }
+
+      function computeEstimate() {
+        const model = data.models.find((m) => m.id === state.modelId);
+        if (!model || !state.months || state.distance == null) return null;
+        const months = state.months;
+        const base = model.rate * months;
+        const discRate = discount(months);
+        const disc = base * discRate;
+        const rental = base - disc;
+        const addOnTotal = [...state.addOns].reduce((sum, id) => {
+          const item = data.addOns.find((a) => a.id === id);
+          return sum + (item ? item.monthly * months : 0);
+        }, 0);
+        const serviceTotal = [...state.services].reduce((sum, id) => {
+          const item = data.services.find((s) => s.id === id);
+          return sum + (item ? item.oneTime : 0);
+        }, 0);
+        const delivery = months >= 12 ? 0 : Math.max(500, state.distance * 4.5);
+        return {
+          model,
+          months,
+          base,
+          discRate,
+          disc,
+          rental,
+          addOnTotal,
+          serviceTotal,
+          delivery,
+          totalRental: rental + addOnTotal,
+          estimatedTotal: rental + addOnTotal + serviceTotal + delivery,
+        };
+      }
+
+      function updateSummary(est) {
+        if (!est) {
+          els.summaryBody.innerHTML = '<p style="margin:0;color:#e2e8f0;">Select a kitchen size, duration, and delivery distance to see your estimate.</p>';
+          return;
+        }
+
+        const addOnsHtml = [...state.addOns].map((id) => {
+          const item = data.addOns.find((a) => a.id === id);
+          return item ? `<div class="mc-summary-row"><span>• ${item.label}</span><span>${fmt(item.monthly)} × ${est.months} = ${fmt(item.monthly * est.months)}</span></div>` : "";
+        }).join("");
+
+        const servicesHtml = [...state.services].map((id) => {
+          const item = data.services.find((s) => s.id === id);
+          return item ? `<div class="mc-summary-row"><span>• ${item.label}</span><span>${fmt(item.oneTime)}</span></div>` : "";
+        }).join("");
+
+        const totalChanged = state.lastTotal !== null && state.lastTotal !== est.estimatedTotal;
+
+        els.summaryBody.innerHTML = `
+          <div class="mc-summary-row"><strong>Kitchen</strong><span>${est.model.name}</span></div>
+          <div class="mc-summary-row"><strong>Duration</strong><span>${est.months} month${est.months > 1 ? "s" : ""}</span></div>
+          <hr class="mc-line" />
+          <div class="mc-summary-row"><span>Base Rental</span><span>${fmt(est.model.rate)} × ${est.months} = ${fmt(est.base)}</span></div>
+          <div class="mc-summary-row"><span>Duration Discount ${est.discRate ? `(${Math.round(est.discRate * 100)}%)` : ""}</span><span>${est.discRate ? "-" + fmt(est.disc) : "$0"}</span></div>
+          <div class="mc-summary-row"><strong>Subtotal Rental</strong><strong>${fmt(est.rental)}</strong></div>
+          ${addOnsHtml ? `<div class="mc-line"></div><div class="mc-summary-row"><strong>Add-ons</strong><strong>${fmt(est.addOnTotal)}</strong></div>${addOnsHtml}` : ""}
+          <hr class="mc-line" />
+          <div class="mc-summary-row"><strong>Total Rental</strong><strong>${fmt(est.totalRental)}</strong></div>
+          <div class="mc-line"></div>
+          <div class="mc-summary-row"><span>Delivery (${state.locationName || "Selected location"} • ${state.distance} mi)</span><span>${est.months >= 12 ? "Included" : fmt(est.delivery)}</span></div>
+          ${servicesHtml}
+          <div class="mc-total ${totalChanged ? "mc-pulse" : ""}"><span>Estimated Total</span><span>${fmt(est.estimatedTotal)}</span></div>
+          <div class="mc-note">This is an estimate. Final pricing may vary based on specific requirements and availability.</div>
+          <div class="mc-note">${est.months >= 12 ? "Free delivery on 12+ month contracts." : "One-way delivery calculated at $4.50/mi, $500 min."}</div>
+        `;
+
+        if (totalChanged) {
+          setTimeout(() => {
+            const totalEl = els.summaryBody.querySelector(".mc-total");
+            if (totalEl) totalEl.classList.remove("mc-pulse");
+          }, 500);
+        }
+        state.lastTotal = est.estimatedTotal;
+      }
+
+      function update() {
+        const input = (els.location.value || "").trim();
+        const matchCurrent = input && state.locationName && input.toLowerCase() === state.locationName.toLowerCase();
+        if (!matchCurrent && input !== "Your current location") {
+          state.locationName = "";
+          if (els.locationResults.style.display !== "none") {
+            // wait for selection; keep distance null until selection
+            state.distance = null;
+          }
+        }
+
+        const est = computeEstimate();
+        const ready = Boolean(est);
+        els.cta.disabled = !ready;
+        els.cta.setAttribute("aria-disabled", ready ? "false" : "true");
+        updateSummary(est);
+      }
+
+      function wire() {
+        els.duration.addEventListener("input", (e) => {
+          const months = Number(e.target.value);
+          state.months = months;
+          updateDurationDisplay(months);
+          update();
+        });
+        els.location.addEventListener("input", () => {
+          state.locationName = "";
+          state.distance = null;
+          els.geoStatus.textContent = "";
+          searchLocations(els.location.value || "");
+          update();
+        });
+        els.geoBtn.addEventListener("click", geolocate);
+        els.cta.addEventListener("click", () => !els.cta.disabled && (window.location.href = "/contact"));
+      }
+
+      renderModels();
+      renderCheckGroup(data.addOns, els.addOns, "addOns", "monthly");
+      renderCheckGroup(data.services, els.services, "services", "oneTime");
+      updateDurationDisplay(1);
+      state.months = 1;
+      wire();
+      update();
+    })();
+  </script>
+</div>
+
