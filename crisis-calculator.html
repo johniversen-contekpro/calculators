@@ -36,6 +36,12 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-size: 1rem;
@@ -43,6 +49,8 @@
             line-height: 1.6;
             color: var(--color-dark-gray);
             background: var(--color-white);
+            margin: 0;
+            padding: 0;
         }
 
         .calculator-container {
@@ -178,55 +186,77 @@
             margin-top: 0.5rem;
         }
 
-        .btn-primary {
+        /* Webflow-style buttons */
+        .new-button {
+            position: relative;
             background: var(--color-primary);
             color: white;
-            padding: 1rem 2rem;
+            padding: 0;
             border-radius: 0.5rem;
             font-weight: 600;
             font-size: 1rem;
             border: none;
             cursor: pointer;
             transition: all 0.2s ease;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            text-decoration: none;
+            display: inline-block;
+            overflow: hidden;
         }
 
-        .btn-primary:hover {
-            background: var(--color-primary-light);
+        .new-button .z-index-2 {
+            position: relative;
+            z-index: 2;
+            padding: 1rem 2rem;
+            display: block;
+        }
+
+        .new-button .button_background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-primary);
+            transition: background 0.2s ease;
+            z-index: 1;
+        }
+
+        .new-button:hover {
             transform: translateY(-2px);
         }
 
-        .btn-primary:active {
+        .new-button:hover .button_background {
+            background: var(--color-primary-light);
+        }
+
+        .new-button:active {
             transform: translateY(0);
         }
 
-        .btn-primary:focus {
+        .new-button:focus {
             outline: 2px solid var(--color-primary);
             outline-offset: 2px;
         }
 
-        .btn-secondary {
+        .new-button.is-secondary {
             background: transparent;
             border: 1px solid var(--color-gray);
             color: var(--color-dark-gray);
-            padding: 1rem 2rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
         }
 
-        .btn-secondary:hover {
+        .new-button.is-secondary .button_background {
+            background: transparent;
+        }
+
+        .new-button.is-secondary:hover {
             border-color: var(--color-dark-gray);
+        }
+
+        .new-button.is-secondary:hover .button_background {
             background: var(--color-light-gray);
         }
 
-        .btn-secondary:focus {
+        .new-button.is-secondary:focus {
             outline: 2px solid var(--color-gray);
             outline-offset: 2px;
         }
@@ -333,9 +363,11 @@
             color: var(--color-gray);
         }
 
-        .cta-container {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
+        .button-group {
+            display: flex;
+            flex-flow: wrap;
+            justify-content: flex-start;
+            align-items: center;
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
@@ -386,8 +418,13 @@
                 grid-template-columns: 1fr;
             }
 
-            .cta-container {
-                grid-template-columns: 1fr;
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .button-group .new-button {
+                width: 100%;
             }
         }
 
@@ -459,8 +496,9 @@
                 </div>
             </div>
 
-            <button id="calculateBtn" class="btn-primary" aria-label="Calculate My Risk">
-                Calculate My Risk →
+            <button id="calculateBtn" class="new-button" aria-label="Calculate My Risk">
+                <div class="z-index-2">Calculate My Risk →</div>
+                <div class="button_background"></div>
             </button>
         </div>
 
@@ -488,12 +526,14 @@
                 </div>
             </div>
 
-            <div class="cta-container">
-                <a href="https://www.mobileculinaire.com/mobile-kitchen#models" id="ctaBtn" class="btn-primary" aria-label="Find The Ideal Mobile Kitchen" target="_blank" rel="noopener noreferrer">
-                    Find The Ideal Mobile Kitchen
+            <div class="button-group">
+                <a href="https://www.mobileculinaire.com/mobile-kitchen#models" id="ctaBtn" class="new-button" aria-label="Find The Ideal Mobile Kitchen" target="_blank" rel="noopener noreferrer">
+                    <div class="z-index-2">Find The Ideal Mobile Kitchen</div>
+                    <div class="button_background"></div>
                 </a>
-                <button id="recalculateBtn" class="btn-secondary" aria-label="Recalculate">
-                    Recalculate
+                <button id="recalculateBtn" class="new-button is-secondary" aria-label="Recalculate">
+                    <div class="z-index-2">Recalculate</div>
+                    <div class="button_background is-secondary"></div>
                 </button>
             </div>
 
@@ -685,48 +725,53 @@
                 // We're in an iframe
                 document.documentElement.classList.add('iframe-embedded');
                 
-                const resizeObserver = new ResizeObserver(() => {
-                    const height = document.documentElement.scrollHeight;
+                function getExactHeight() {
+                    // Get the actual content height without extra padding
+                    const container = document.querySelector('.calculator-container');
+                    if (container) {
+                        const rect = container.getBoundingClientRect();
+                        const containerBottom = rect.bottom;
+                        // Add a small buffer for the last element's margin
+                        return Math.ceil(containerBottom + 1);
+                    }
+                    // Fallback to body height
+                    return Math.ceil(document.body.scrollHeight);
+                }
+                
+                function sendHeight() {
+                    const height = getExactHeight();
                     window.parent.postMessage({
                         type: 'resize',
                         height: height
                     }, '*');
+                }
+                
+                const resizeObserver = new ResizeObserver(() => {
+                    sendHeight();
                 });
 
                 resizeObserver.observe(document.body);
+                if (document.querySelector('.calculator-container')) {
+                    resizeObserver.observe(document.querySelector('.calculator-container'));
+                }
 
                 // Initial resize
-                setTimeout(() => {
-                    const height = document.documentElement.scrollHeight;
-                    window.parent.postMessage({
-                        type: 'resize',
-                        height: height
-                    }, '*');
-                }, 100);
+                setTimeout(sendHeight, 100);
+                setTimeout(sendHeight, 300); // Double check after animations
 
                 // Resize on state changes
                 const originalShowResults = showResults;
                 showResults = function() {
                     originalShowResults();
-                    setTimeout(() => {
-                        const height = document.documentElement.scrollHeight;
-                        window.parent.postMessage({
-                            type: 'resize',
-                            height: height
-                        }, '*');
-                    }, 100);
+                    setTimeout(sendHeight, 100);
+                    setTimeout(sendHeight, 500); // After animations complete
                 };
 
                 const originalResetCalculator = resetCalculator;
                 resetCalculator = function() {
                     originalResetCalculator();
-                    setTimeout(() => {
-                        const height = document.documentElement.scrollHeight;
-                        window.parent.postMessage({
-                            type: 'resize',
-                            height: height
-                        }, '*');
-                    }, 400);
+                    setTimeout(sendHeight, 100);
+                    setTimeout(sendHeight, 500); // After transition
                 };
             }
         }
