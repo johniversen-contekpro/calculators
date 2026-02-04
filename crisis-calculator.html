@@ -634,13 +634,37 @@
         calculateBtn.addEventListener('click', showResults);
         recalculateBtn.addEventListener('click', resetCalculator);
 
-        // CTA click tracking
-        ctaBtn.addEventListener('click', () => {
+        // CTA click tracking and parent page scroll
+        ctaBtn.addEventListener('click', (e) => {
             const results = calculateResults();
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'calculator_cta_click', {
                     'savings_shown': results.netRevenuePreserved
                 });
+            }
+
+            // If in iframe, scroll parent page to #quote section
+            if (window.parent !== window) {
+                e.preventDefault();
+                try {
+                    // Try to scroll parent page to #quote
+                    const parentWindow = window.parent;
+                    const quoteElement = parentWindow.document.getElementById('quote');
+                    
+                    if (quoteElement) {
+                        quoteElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        // Fallback: try to navigate parent to #quote
+                        parentWindow.location.hash = 'quote';
+                        parentWindow.location.reload();
+                    }
+                } catch (error) {
+                    // If cross-origin or other error, use postMessage
+                    window.parent.postMessage({
+                        type: 'scrollTo',
+                        target: 'quote'
+                    }, '*');
+                }
             }
         });
 
