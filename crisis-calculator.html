@@ -70,27 +70,12 @@
             }
         }
 
-        .calculator-header {
-            text-align: left;
-            margin-bottom: 2.5rem;
-        }
-
-        .calculator-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--color-primary);
-            margin-bottom: 0.75rem;
-            display: block;
-        }
-
         .calculator-title {
             font-size: 25px;
             font-weight: 700;
             line-height: 1.2;
             color: var(--color-black);
-            margin-bottom: 0;
+            margin-bottom: 1rem;
         }
 
         .calculator-title .highlight-red {
@@ -100,7 +85,21 @@
         .calculator-subtitle {
             font-size: 1rem;
             color: var(--color-gray);
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 767px) {
+            .calculator-subtitle {
+                font-size: 0.9375rem;
+                margin-bottom: 2rem;
+            }
+        }
+
+        @media (max-width: 479px) {
+            .calculator-subtitle {
+                font-size: 0.875rem;
+            }
         }
 
         .calculator-card {
@@ -110,6 +109,10 @@
             padding: 2.5rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             margin-bottom: 2rem;
+        }
+
+        .calculator-card-header {
+            margin-bottom: 2.5rem;
         }
 
         .input-group {
@@ -450,14 +453,16 @@
 </head>
 <body>
     <div class="calculator-container">
-        <div class="calculator-header">
-            <div class="calculator-title">
-                Estimate Revenue Loss While Renovating Your Commercial Kitchen
-            </div>
-        </div>
-
         <!-- Input State -->
         <div id="inputState" class="calculator-card">
+            <div class="calculator-card-header">
+                <div class="calculator-title">
+                    Calculate What Closing Your Kitchen Will Actually Cost
+                </div>
+                <div class="calculator-subtitle">
+                    Most facilities underestimate closure costs by 3-5x. Find out your real exposure in seconds.
+                </div>
+            </div>
             <div class="input-group">
                 <label for="dailyRevenue" class="input-label">
                     Your average daily kitchen revenue
