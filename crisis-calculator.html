@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renovation Risk Calculator - Mobile Culinaire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Primary */
+            --color-primary: #286140;
+            --color-primary-light: #286140;
+            
+            /* Neutral */
+            --color-black: #314254;
+            --color-navy: #314254;
+            --color-dark-gray: #333333;
+            --color-gray: #666666;
+            --color-light-gray: #F5F5F5;
+            --color-white: #FFFFFF;
+            
+            /* Accent */
+            --color-accent-red: #314254;
+            --color-accent-green: #286140;
+            
+            /* Backgrounds */
+            --bg-section-dark: #1A1A1A;
+            --bg-section-light: #F5F5F5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.6;
+            color: var(--color-dark-gray);
+            background: var(--color-white);
+        }
+
+        .calculator-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        .calculator-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .calculator-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-primary);
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .calculator-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--color-black);
+            margin-bottom: 0;
+        }
+
+        .calculator-title .highlight-red {
+            color: #286140;
+        }
+
+        .calculator-subtitle {
+            font-size: 1rem;
+            color: var(--color-gray);
+            margin-bottom: 2rem;
+        }
+
+        .calculator-card {
+            background: var(--color-white);
+            border: 1px solid #E5E5E5;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 2.5rem;
+        }
+
+        .input-label {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-black);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--color-light-gray);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            background: var(--color-primary-light);
+            transform: scale(1.1);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .slider::-moz-range-thumb:hover {
+            background: var(--color-primary-light);
+            transform: scale(1.1);
+        }
+
+        .slider-value {
+            min-width: 140px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-black);
+            text-align: right;
+        }
+
+        .slider-hint {
+            font-size: 0.875rem;
+            color: var(--color-gray);
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:focus {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--color-gray);
+            color: var(--color-dark-gray);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-dark-gray);
+            background: var(--color-light-gray);
+        }
+
+        .btn-secondary:focus {
+            outline: 2px solid var(--color-gray);
+            outline-offset: 2px;
+        }
+
+        /* Results State */
+        .results-container {
+            display: none;
+        }
+
+        .results-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .total-risk-card {
+            background: linear-gradient(135deg, rgba(49, 66, 84, 0.1) 0%, rgba(49, 66, 84, 0.05) 100%);
+            border: 2px solid var(--color-accent-red);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .total-risk-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-accent-red);
+            margin-bottom: 1rem;
+        }
+
+        .total-risk-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.1;
+            color: var(--color-accent-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .total-risk-description {
+            font-size: 1.125rem;
+            color: var(--color-gray);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-card {
+            background: var(--color-white);
+            border: 1px solid #E5E5E5;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .comparison-card.without {
+            border-left: 4px solid var(--color-accent-red);
+        }
+
+        .comparison-card.with {
+            border-left: 4px solid var(--color-accent-green);
+        }
+
+        .comparison-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-black);
+            margin-bottom: 1.25rem;
+        }
+
+        .comparison-amount {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
+        }
+
+        .comparison-amount.negative {
+            color: #DC2626;
+        }
+
+        .comparison-amount.positive {
+            color: var(--color-accent-green);
+        }
+
+        .comparison-description {
+            font-size: 1rem;
+            color: var(--color-gray);
+        }
+
+        .cta-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .trust-badges {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--color-gray);
+            padding-top: 1rem;
+            border-top: 1px solid #E5E5E5;
+        }
+
+        /* Responsive */
+        @media (max-width: 767px) {
+            .calculator-container {
+                padding: 2.5rem 1rem;
+            }
+
+            .calculator-title {
+                font-size: 1.875rem;
+            }
+
+            .calculator-card {
+                padding: 1.75rem;
+            }
+
+            .slider-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .slider-value {
+                text-align: left;
+                min-width: auto;
+            }
+
+            .total-risk-amount {
+                font-size: 2.25rem;
+            }
+            
+            .comparison-amount {
+                font-size: 1.75rem;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="calculator-header">
+            <h2 class="calculator-title">
+                Estimate Revenue Loss While Renovating Your Commercial Kitchen
+            </h2>
+        </div>
+
+        <!-- Input State -->
+        <div id="inputState" class="calculator-card">
+            <div class="input-group">
+                <label for="dailyRevenue" class="input-label">
+                    Your average daily kitchen revenue
+                </label>
+                <div class="slider-container">
+                    <input 
+                        type="range" 
+                        id="dailyRevenue" 
+                        class="slider" 
+                        min="500" 
+                        max="40000" 
+                        value="15000" 
+                        step="500"
+                        aria-label="Your average daily kitchen revenue"
+                        aria-valuemin="500"
+                        aria-valuemax="40000"
+                        aria-valuenow="15000"
+                    >
+                    <span class="slider-value" id="dailyRevenueValue">$15,000/day</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="renovationWeeks" class="input-label">
+                    Expected renovation duration
+                </label>
+                <div class="slider-container">
+                    <input 
+                        type="range" 
+                        id="renovationWeeks" 
+                        class="slider" 
+                        min="4" 
+                        max="52" 
+                        value="12" 
+                        step="1"
+                        aria-label="Expected renovation duration in weeks"
+                        aria-valuemin="4"
+                        aria-valuemax="52"
+                        aria-valuenow="12"
+                    >
+                    <span class="slider-value" id="renovationWeeksValue">12 weeks</span>
+                </div>
+            </div>
+
+            <button id="calculateBtn" class="btn-primary" aria-label="Calculate My Risk">
+                Calculate My Risk →
+            </button>
+        </div>
+
+        <!-- Results State -->
+        <div id="resultsState" class="results-container">
+            <div class="total-risk-card">
+                <div class="total-risk-label">TOTAL REVENUE AT RISK</div>
+                <div class="total-risk-amount" id="totalRiskAmount">$0</div>
+                <div class="total-risk-description" id="totalRiskDescription">
+                    over 12 weeks without kitchen operations
+                </div>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="comparison-card without">
+                    <div class="comparison-title">Without Mobile Culinaire</div>
+                    <div class="comparison-amount negative" id="withoutAmount">$0</div>
+                    <div class="comparison-description">lost revenue</div>
+                </div>
+
+                <div class="comparison-card with">
+                    <div class="comparison-title">With Mobile Culinaire</div>
+                    <div class="comparison-amount positive" id="withAmount">$0</div>
+                    <div class="comparison-description">net revenue preserved</div>
+                </div>
+            </div>
+
+            <div class="cta-container">
+                <a href="/contact" id="ctaBtn" class="btn-primary" aria-label="Find The Ideal Mobile Kitchen">
+                    Find The Ideal Mobile Kitchen
+                </a>
+                <button id="recalculateBtn" class="btn-secondary" aria-label="Recalculate">
+                    Recalculate
+                </button>
+            </div>
+
+            <div class="trust-badges">
+                48h lead time · Nationwide delivery · 400+ units deployed
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Constants
+        const MOBILE_KITCHEN_MONTHLY_COST = 8500;
+        const ANIMATION_DURATION = 2000; // 2 seconds
+
+        // DOM Elements
+        const dailyRevenueSlider = document.getElementById('dailyRevenue');
+        const dailyRevenueValue = document.getElementById('dailyRevenueValue');
+        const renovationWeeksSlider = document.getElementById('renovationWeeks');
+        const renovationWeeksValue = document.getElementById('renovationWeeksValue');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const inputState = document.getElementById('inputState');
+        const resultsState = document.getElementById('resultsState');
+        const totalRiskAmount = document.getElementById('totalRiskAmount');
+        const totalRiskDescription = document.getElementById('totalRiskDescription');
+        const withoutAmount = document.getElementById('withoutAmount');
+        const withAmount = document.getElementById('withAmount');
+        const recalculateBtn = document.getElementById('recalculateBtn');
+        const ctaBtn = document.getElementById('ctaBtn');
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Update slider displays
+        function updateDailyRevenueDisplay() {
+            const value = parseInt(dailyRevenueSlider.value);
+            dailyRevenueValue.textContent = formatCurrency(value) + '/day';
+            dailyRevenueSlider.setAttribute('aria-valuenow', value);
+        }
+
+        function updateRenovationWeeksDisplay() {
+            const value = parseInt(renovationWeeksSlider.value);
+            renovationWeeksValue.textContent = value + (value === 1 ? ' week' : ' weeks');
+            renovationWeeksSlider.setAttribute('aria-valuenow', value);
+        }
+
+        // Calculate results
+        function calculateResults() {
+            const dailyRevenue = parseInt(dailyRevenueSlider.value);
+            const renovationWeeks = parseInt(renovationWeeksSlider.value);
+            const totalDays = renovationWeeks * 7;
+            const totalLoss = dailyRevenue * totalDays;
+            const mobileKitchenTotalCost = (renovationWeeks / 4) * MOBILE_KITCHEN_MONTHLY_COST;
+            const netRevenuePreserved = totalLoss - mobileKitchenTotalCost;
+            const savingsPercent = Math.round((netRevenuePreserved / totalLoss) * 100);
+
+            return {
+                totalLoss,
+                mobileKitchenTotalCost,
+                netRevenuePreserved,
+                savingsPercent,
+                renovationWeeks,
+                dailyRevenue
+            };
+        }
+
+        // Animate counter
+        function animateCounter(element, startValue, endValue, duration, callback) {
+            const startTime = performance.now();
+            const difference = endValue - startValue;
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function (ease-out)
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (difference * easeOut);
+                
+                element.textContent = formatCurrency(Math.round(currentValue));
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = formatCurrency(endValue);
+                    if (callback) callback();
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Show results
+        function showResults() {
+            const results = calculateResults();
+
+            // Hide input, show results
+            inputState.style.display = 'none';
+            resultsState.classList.add('active');
+
+            // Update description
+            totalRiskDescription.textContent = 
+                `over ${results.renovationWeeks} ${results.renovationWeeks === 1 ? 'week' : 'weeks'} without kitchen operations`;
+
+            // Animate total risk counter
+            animateCounter(totalRiskAmount, 0, results.totalLoss, ANIMATION_DURATION, () => {
+                // After total risk animation, animate comparison amounts
+                animateCounter(withoutAmount, 0, results.totalLoss, 1000);
+                animateCounter(withAmount, 0, results.netRevenuePreserved, 1000);
+            });
+
+            // Track GA4 event
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'calculator_submit', {
+                    'daily_revenue': results.dailyRevenue,
+                    'renovation_weeks': results.renovationWeeks,
+                    'total_loss': results.totalLoss
+                });
+            }
+        }
+
+        // Reset to input state
+        function resetCalculator() {
+            resultsState.classList.remove('active');
+            setTimeout(() => {
+                inputState.style.display = 'block';
+                resultsState.style.display = 'none';
+            }, 300);
+        }
+
+        // Event Listeners
+        dailyRevenueSlider.addEventListener('input', updateDailyRevenueDisplay);
+        renovationWeeksSlider.addEventListener('input', updateRenovationWeeksDisplay);
+        calculateBtn.addEventListener('click', showResults);
+        recalculateBtn.addEventListener('click', resetCalculator);
+
+        // CTA click tracking
+        ctaBtn.addEventListener('click', () => {
+            const results = calculateResults();
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'calculator_cta_click', {
+                    'savings_shown': results.netRevenuePreserved
+                });
+            }
+        });
+
+        // Keyboard accessibility for sliders
+        dailyRevenueSlider.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                updateDailyRevenueDisplay();
+            }
+        });
+
+        renovationWeeksSlider.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                updateRenovationWeeksDisplay();
+            }
+        });
+
+        // Initialize displays
+        updateDailyRevenueDisplay();
+        updateRenovationWeeksDisplay();
+
+        // Intersection Observer for animations (if needed for scroll-triggered animations)
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                }
+            });
+        }, observerOptions);
+
+        observer.observe(resultsState);
+    </script>
+</body>
+</html>
