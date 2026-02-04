@@ -487,7 +487,7 @@
             </div>
 
             <div class="cta-container">
-                <a href="#quote" id="ctaBtn" class="btn-primary" aria-label="Find The Ideal Mobile Kitchen">
+                <a href="https://www.mobileculinaire.com/mobile-kitchen#models" id="ctaBtn" class="btn-primary" aria-label="Find The Ideal Mobile Kitchen" target="_blank" rel="noopener noreferrer">
                     Find The Ideal Mobile Kitchen
                 </a>
                 <button id="recalculateBtn" class="btn-secondary" aria-label="Recalculate">
@@ -634,37 +634,13 @@
         calculateBtn.addEventListener('click', showResults);
         recalculateBtn.addEventListener('click', resetCalculator);
 
-        // CTA click tracking and parent page scroll
-        ctaBtn.addEventListener('click', (e) => {
+        // CTA click tracking
+        ctaBtn.addEventListener('click', () => {
             const results = calculateResults();
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'calculator_cta_click', {
                     'savings_shown': results.netRevenuePreserved
                 });
-            }
-
-            // If in iframe, scroll parent page to #quote section
-            if (window.parent !== window) {
-                e.preventDefault();
-                try {
-                    // Try to scroll parent page to #quote
-                    const parentWindow = window.parent;
-                    const quoteElement = parentWindow.document.getElementById('quote');
-                    
-                    if (quoteElement) {
-                        quoteElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    } else {
-                        // Fallback: try to navigate parent to #quote
-                        parentWindow.location.hash = 'quote';
-                        parentWindow.location.reload();
-                    }
-                } catch (error) {
-                    // If cross-origin or other error, use postMessage
-                    window.parent.postMessage({
-                        type: 'scrollTo',
-                        target: 'quote'
-                    }, '*');
-                }
             }
         });
 
