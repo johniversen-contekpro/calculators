@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Renovation Cost Calculator - Mobile Culinaire</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #286140;
+            --color-primary-light: #286140;
+            --color-black: #314254;
+            --color-navy: #314254;
+            --color-dark-gray: #333333;
+            --color-gray: #666666;
+            --color-light-gray: #F5F5F5;
+            --color-white: #FFFFFF;
+            --color-accent-red: #314254;
+            --color-accent-green: #286140;
+            --color-danger: #DC2626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.6;
+            color: var(--color-dark-gray);
+            background: var(--color-white);
+        }
+
+        .calculator-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        html.iframe-embedded .calculator-container {
+            padding: 2.5rem 1.5rem;
+        }
+
+        @media (max-width: 767px) {
+            html.iframe-embedded .calculator-container {
+                padding: 2rem 1rem 1rem 1rem;
+            }
+            .calculator-container {
+                padding: 2.5rem 1rem 1.5rem 1rem;
+            }
+        }
+
+        .calculator-card {
+            background: var(--color-white);
+            border: 1px solid #E5E5E5;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .calculator-card-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .calculator-title {
+            font-size: 25px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--color-black);
+            margin-bottom: 1rem;
+        }
+
+        .calculator-subtitle {
+            font-size: 1rem;
+            color: var(--color-gray);
+            margin-bottom: 2.5rem;
+            line-height: 1.5;
+        }
+
+        /* Wizard Steps */
+        .wizard-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .wizard-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--color-light-gray);
+            z-index: 0;
+        }
+
+        .wizard-step {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .wizard-step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-light-gray);
+            color: var(--color-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 auto 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .wizard-step.active .wizard-step-number {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .wizard-step.completed .wizard-step-number {
+            background: var(--color-accent-green);
+            color: white;
+        }
+
+        .wizard-step-label {
+            font-size: 0.875rem;
+            color: var(--color-gray);
+            font-weight: 500;
+        }
+
+        .wizard-step.active .wizard-step-label {
+            color: var(--color-black);
+            font-weight: 600;
+        }
+
+        /* Form Sections */
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+        }
+
+        .input-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-black);
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .input-label .required {
+            color: var(--color-danger);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid #E5E5E5;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+            color: var(--color-black);
+            background: var(--color-white);
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(40, 97, 64, 0.1);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--color-light-gray);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-value {
+            min-width: 120px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-black);
+            text-align: right;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1rem;
+            border: 1px solid #E5E5E5;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-option:hover {
+            border-color: var(--color-primary);
+            background: rgba(40, 97, 64, 0.05);
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 0.75rem;
+            cursor: pointer;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 1px solid #E5E5E5;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-option:hover {
+            border-color: var(--color-primary);
+            background: rgba(40, 97, 64, 0.05);
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            margin-top: 0.25rem;
+            cursor: pointer;
+        }
+
+        .checkbox-option-label {
+            flex: 1;
+        }
+
+        .checkbox-option-label strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: var(--color-black);
+        }
+
+        .checkbox-option-label small {
+            font-size: 0.875rem;
+            color: var(--color-gray);
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            flex-flow: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        .new-button {
+            position: relative;
+            background: var(--color-primary);
+            color: white;
+            padding: 0;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .new-button .z-index-2 {
+            position: relative;
+            z-index: 2;
+            padding: 1rem 2rem;
+            display: block;
+        }
+
+        .new-button .button_background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-primary);
+            transition: background 0.2s ease;
+            z-index: 1;
+        }
+
+        .new-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .new-button:hover .button_background {
+            background: var(--color-primary-light);
+        }
+
+        .new-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .new-button.is-secondary {
+            background: transparent;
+            border: 1px solid var(--color-gray);
+            color: var(--color-dark-gray);
+        }
+
+        .new-button.is-secondary .button_background {
+            background: transparent;
+        }
+
+        .new-button.is-secondary:hover {
+            border-color: var(--color-dark-gray);
+        }
+
+        .new-button.is-secondary:hover .button_background {
+            background: var(--color-light-gray);
+        }
+
+        /* Results */
+        .results-container {
+            display: none;
+        }
+
+        .results-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results-container.blurred {
+            filter: blur(8px);
+            pointer-events: none;
+            user-select: none;
+            transition: filter 0.3s ease;
+        }
+
+        .results-container.blurred * {
+            pointer-events: none;
+        }
+
+        .big-number-card {
+            background: linear-gradient(135deg, rgba(49, 66, 84, 0.1) 0%, rgba(49, 66, 84, 0.05) 100%);
+            border: 2px solid var(--color-accent-red);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .big-number-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-accent-red);
+            margin-bottom: 1rem;
+        }
+
+        .big-number-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.1;
+            color: var(--color-accent-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .big-number-description {
+            font-size: 1rem;
+            color: var(--color-gray);
+        }
+
+        .big-number-card.positive {
+            border-color: var(--color-accent-green);
+            background: linear-gradient(135deg, rgba(40, 97, 64, 0.1) 0%, rgba(40, 97, 64, 0.05) 100%);
+        }
+
+        .big-number-card.positive .big-number-label,
+        .big-number-card.positive .big-number-amount {
+            color: var(--color-accent-green);
+        }
+
+        .roi-statement {
+            background: var(--color-light-gray);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-black);
+        }
+
+        .roi-statement .highlight {
+            color: var(--color-primary);
+        }
+
+        /* Email Gate Modal */
+        .email-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .email-modal.active {
+            display: flex;
+        }
+
+        .email-modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+        }
+
+        .email-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-gray);
+        }
+
+        .email-modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--color-black);
+        }
+
+        .email-modal-text {
+            color: var(--color-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .email-input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .email-input-group input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid #E5E5E5;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 767px) {
+            .calculator-title {
+                font-size: 20px;
+            }
+
+            .calculator-subtitle {
+                font-size: 0.9375rem;
+                margin-bottom: 2rem;
+            }
+
+            .calculator-card {
+                padding: 1.75rem;
+            }
+
+            .wizard-steps {
+                margin-bottom: 2rem;
+            }
+
+            .wizard-step-label {
+                font-size: 0.75rem;
+            }
+
+            .section-title {
+                font-size: 1.25rem;
+            }
+
+            .slider-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .slider-value {
+                text-align: left;
+                min-width: auto;
+            }
+
+            .big-number-amount {
+                font-size: 2.25rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group .new-button {
+                width: 100%;
+            }
+
+            #detailedReport > div:first-of-type {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 479px) {
+            .calculator-title {
+                font-size: 18px;
+            }
+
+            .calculator-subtitle {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="calculator-card">
+            <div class="calculator-card-header">
+                <div class="calculator-title">
+                    How Much Revenue Will Your Kitchen Renovation Really Cost You?
+                </div>
+                <div class="calculator-subtitle">
+                    Most facilities underestimate closure costs by 3-5x. Find out your real exposure in seconds.
+                </div>
+            </div>
+
+            <!-- Wizard Steps Indicator -->
+            <div class="wizard-steps">
+                <div class="wizard-step active" data-step="1">
+                    <div class="wizard-step-number">1</div>
+                    <div class="wizard-step-label">Operation</div>
+                </div>
+                <div class="wizard-step" data-step="2">
+                    <div class="wizard-step-number">2</div>
+                    <div class="wizard-step-label">Revenue</div>
+                </div>
+                <div class="wizard-step" data-step="3">
+                    <div class="wizard-step-number">3</div>
+                    <div class="wizard-step-label">Scenarios</div>
+                </div>
+            </div>
+
+            <!-- Form Sections -->
+            <form id="calculatorForm">
+                <!-- Section A: Operation Profile -->
+                <div class="form-section active" id="sectionA">
+                    <h2 class="section-title">Operation Profile</h2>
+
+                    <div class="input-group">
+                        <label for="operationType" class="input-label">
+                            Operation Type <span class="required">*</span>
+                        </label>
+                        <select id="operationType" name="operationType" required>
+                            <option value="">Select operation type</option>
+                            <option value="hotel">Hotel</option>
+                            <option value="resort">Resort</option>
+                            <option value="country-club">Country Club</option>
+                            <option value="golf-course">Golf Course</option>
+                            <option value="university">University / Institutional</option>
+                            <option value="restaurant">Restaurant</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="dailyCovers" class="input-label">
+                            Average Daily Covers <span class="required">*</span>
+                        </label>
+                        <input type="number" id="dailyCovers" name="dailyCovers" min="1" required placeholder="e.g., 200">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="averageCheck" class="input-label">
+                            Average Check per Guest ($) <span class="required">*</span>
+                        </label>
+                        <input type="number" id="averageCheck" name="averageCheck" min="0" step="0.01" required placeholder="e.g., 45.00">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="daysOpen" class="input-label">
+                            Days Open per Week <span class="required">*</span>
+                        </label>
+                        <input type="number" id="daysOpen" name="daysOpen" min="1" max="7" required value="7">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="renovationWeeks" class="input-label">
+                            Estimated Renovation Duration (weeks) <span class="required">*</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="renovationWeeks" name="renovationWeeks" class="slider" min="4" max="52" value="12" step="1" required>
+                            <span class="slider-value" id="renovationWeeksValue">12 weeks</span>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="new-button" id="nextToSectionB">
+                            <div class="z-index-2">Continue →</div>
+                            <div class="button_background"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section B: Revenue Structure -->
+                <div class="form-section" id="sectionB">
+                    <h2 class="section-title">Revenue Structure</h2>
+
+                    <div class="input-group">
+                        <label for="foodRevenuePercent" class="input-label">
+                            Food Revenue % of Total F&B <span class="required">*</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="foodRevenuePercent" name="foodRevenuePercent" class="slider" min="0" max="100" value="70" step="1" required>
+                            <span class="slider-value" id="foodRevenuePercentValue">70%</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="beverageRevenuePercent" class="input-label">
+                            Beverage Revenue % of Total F&B <span class="required">*</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="beverageRevenuePercent" name="beverageRevenuePercent" class="slider" min="0" max="100" value="30" step="1" required>
+                            <span class="slider-value" id="beverageRevenuePercentValue">30%</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="cateringRevenue" class="input-label">
+                            Catering / Events Revenue per Month ($)
+                        </label>
+                        <input type="number" id="cateringRevenue" name="cateringRevenue" min="0" step="100" placeholder="e.g., 5000">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            % of Revenue Lost if Closed <span class="required">*</span>
+                        </label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="revenueLostPercent" value="100" required>
+                                <span>100% - Complete closure</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="revenueLostPercent" value="75" required>
+                                <span>75% - Partial operations possible</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="revenueLostPercent" value="50" required>
+                                <span>50% - Significant outsourcing available</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="new-button is-secondary" id="backToSectionA">
+                            <div class="z-index-2">← Back</div>
+                            <div class="button_background is-secondary"></div>
+                        </button>
+                        <button type="button" class="new-button" id="nextToSectionC">
+                            <div class="z-index-2">Continue →</div>
+                            <div class="button_background"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section C: Alternative Scenarios -->
+                <div class="form-section" id="sectionC">
+                    <h2 class="section-title">Alternative Scenarios</h2>
+
+                    <div class="input-group">
+                        <label class="input-label">
+                            Can you operate a reduced menu?
+                        </label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="reducedMenu" value="yes">
+                                <span>Yes</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="reducedMenu" value="no" checked>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="revenueRetainedPercent" class="input-label">
+                            Estimated % Revenue Retained with Temporary Kitchen <span class="required">*</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="revenueRetainedPercent" name="revenueRetainedPercent" class="slider" min="0" max="100" value="95" step="1" required>
+                            <span class="slider-value" id="revenueRetainedPercentValue">95%</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="rentalCost" class="input-label">
+                            Estimated Rental Cost of Temporary Solution ($/month)
+                        </label>
+                        <input type="number" id="rentalCost" name="rentalCost" min="0" step="100" placeholder="Leave blank for auto-estimate" value="8500">
+                        <small style="display: block; margin-top: 0.5rem; color: var(--color-gray); font-size: 0.875rem;">
+                            Default: $8,500/month (auto-calculated based on duration)
+                        </small>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="includeSoftCosts" name="includeSoftCosts">
+                            <div class="checkbox-option-label">
+                                <strong>Include reputation & member attrition risk</strong>
+                                <small>Add 10-20% estimated impact for member churn, brand damage, and event cancellation losses</small>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="new-button is-secondary" id="backToSectionB">
+                            <div class="z-index-2">← Back</div>
+                            <div class="button_background is-secondary"></div>
+                        </button>
+                        <button type="submit" class="new-button" id="calculateBtn">
+                            <div class="z-index-2">Calculate Impact →</div>
+                            <div class="button_background"></div>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Results State -->
+            <div id="resultsState" class="results-container">
+                <div id="resultsHeader" style="display: none; margin-bottom: 2.5rem;">
+                    <div class="calculator-title">
+                        How Much Revenue Will Your Kitchen Renovation Really Cost You?
+                    </div>
+                    <div class="calculator-subtitle" style="margin-bottom: 0;">
+                        Here's your detailed financial impact analysis.
+                    </div>
+                </div>
+
+                <div class="big-number-card">
+                    <div class="big-number-label">TOTAL REVENUE AT RISK</div>
+                    <div class="big-number-amount" id="totalRiskAmount">$0</div>
+                    <div class="big-number-description" id="totalRiskDescription">over renovation period</div>
+                </div>
+
+                <div class="big-number-card">
+                    <div class="big-number-label">ESTIMATED REVENUE LOST IF CLOSED</div>
+                    <div class="big-number-amount" id="revenueLostAmount">$0</div>
+                    <div class="big-number-description">without temporary kitchen solution</div>
+                </div>
+
+                <div class="big-number-card positive">
+                    <div class="big-number-label">POTENTIAL REVENUE PROTECTED</div>
+                    <div class="big-number-amount" id="revenueProtectedAmount">$0</div>
+                    <div class="big-number-description">with Mobile Culinaire temporary kitchen</div>
+                </div>
+
+                <div class="roi-statement" id="roiStatement">
+                    For every $1 spent on a temporary kitchen,<br>
+                    you protect $<span class="highlight" id="roiRatio">0</span> in revenue.
+                </div>
+
+                <!-- Detailed Report Section (shown after email submission) -->
+                <div id="detailedReport" style="display: none; margin-top: 2.5rem; padding-top: 2.5rem; border-top: 2px solid #E5E5E5;">
+                    <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--color-black); margin-bottom: 1.5rem;">Detailed Impact Analysis</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                        <div style="background: var(--color-light-gray); padding: 1.5rem; border-radius: 0.5rem;">
+                            <div style="font-size: 0.875rem; color: var(--color-gray); margin-bottom: 0.5rem;">Daily Revenue</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-black);" id="reportDailyRevenue">$0</div>
+                        </div>
+                        <div style="background: var(--color-light-gray); padding: 1.5rem; border-radius: 0.5rem;">
+                            <div style="font-size: 0.875rem; color: var(--color-gray); margin-bottom: 0.5rem;">Weekly Revenue</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-black);" id="reportWeeklyRevenue">$0</div>
+                        </div>
+                        <div style="background: var(--color-light-gray); padding: 1.5rem; border-radius: 0.5rem;">
+                            <div style="font-size: 0.875rem; color: var(--color-gray); margin-bottom: 0.5rem;">Total Rental Cost</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-black);" id="reportRentalCost">$0</div>
+                        </div>
+                        <div style="background: var(--color-light-gray); padding: 1.5rem; border-radius: 0.5rem;">
+                            <div style="font-size: 0.875rem; color: var(--color-gray); margin-bottom: 0.5rem;">Net Savings</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-accent-green);" id="reportNetSavings">$0</div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; border: 1px solid #E5E5E5; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <h4 style="font-size: 1.125rem; font-weight: 600; color: var(--color-black); margin-bottom: 1rem;">Breakdown</h4>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #E5E5E5;">
+                            <span style="color: var(--color-gray);">Revenue at Risk:</span>
+                            <span style="font-weight: 600; color: var(--color-black);" id="breakdownRevenueAtRisk">$0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #E5E5E5;">
+                            <span style="color: var(--color-gray);">Revenue Lost (if closed):</span>
+                            <span style="font-weight: 600; color: var(--color-danger);" id="breakdownRevenueLost">$0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #E5E5E5;">
+                            <span style="color: var(--color-gray);">Revenue Retained (with mobile kitchen):</span>
+                            <span style="font-weight: 600; color: var(--color-accent-green);" id="breakdownRevenueRetained">$0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #E5E5E5;">
+                            <span style="color: var(--color-gray);">Temporary Kitchen Cost:</span>
+                            <span style="font-weight: 600; color: var(--color-black);" id="breakdownKitchenCost">$0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; margin-top: 0.5rem;">
+                            <span style="font-weight: 700; color: var(--color-black);">Net Revenue Protected:</span>
+                            <span style="font-weight: 700; font-size: 1.25rem; color: var(--color-accent-green);" id="breakdownNetProtected">$0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <a href="https://www.mobileculinaire.com/mobile-kitchen#models" id="ctaBtn" class="new-button" target="_blank" rel="noopener noreferrer">
+                        <div class="z-index-2">Browse Mobile Kitchen Rentals</div>
+                        <div class="button_background"></div>
+                    </a>
+                    <button type="button" id="recalculateBtn" class="new-button is-secondary">
+                        <div class="z-index-2">Recalculate</div>
+                        <div class="button_background is-secondary"></div>
+                    </button>
+                </div>
+
+                <div style="text-align: center; font-size: 0.875rem; color: var(--color-gray); margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #E5E5E5;">
+                    48h lead time · Nationwide delivery · 400+ units deployed
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Gate Modal -->
+    <div class="email-modal" id="emailModal">
+        <div class="email-modal-content">
+            <button class="email-modal-close" id="closeEmailModal">&times;</button>
+            <h3 class="email-modal-title">Access Your Full Impact Report</h3>
+            <p class="email-modal-text">Enter your email to unlock the detailed breakdown of your renovation cost analysis.</p>
+            <form id="emailForm">
+                <div class="email-input-group">
+                    <input type="email" id="userEmail" name="email" placeholder="your.email@example.com" required>
+                </div>
+                <div class="button-group" style="margin-top: 0;">
+                    <button type="submit" class="new-button" style="width: 100%;">
+                        <div class="z-index-2">View Full Report</div>
+                        <div class="button_background"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Wizard Navigation
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        function updateWizardSteps() {
+            document.querySelectorAll('.wizard-step').forEach((step, index) => {
+                const stepNum = index + 1;
+                step.classList.remove('active', 'completed');
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function goToStep(step) {
+            currentStep = step;
+            updateWizardSteps();
+            if (step === 1) showSection('sectionA');
+            else if (step === 2) showSection('sectionB');
+            else if (step === 3) showSection('sectionC');
+            
+            // Scroll to top when changing steps
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (window.parent !== window) {
+                    // If in iframe, try to scroll parent
+                    try {
+                        window.parent.scrollTo({ top: 0, behavior: 'smooth' });
+                    } catch (e) {
+                        // Cross-origin, can't scroll parent
+                    }
+                }
+            }, 100);
+        }
+
+        // Slider Updates
+        function updateSliderDisplay(sliderId, valueId, formatFn) {
+            const slider = document.getElementById(sliderId);
+            const valueDisplay = document.getElementById(valueId);
+            if (slider && valueDisplay) {
+                slider.addEventListener('input', () => {
+                    valueDisplay.textContent = formatFn(parseInt(slider.value));
+                });
+            }
+        }
+
+        updateSliderDisplay('renovationWeeks', 'renovationWeeksValue', (val) => val + (val === 1 ? ' week' : ' weeks'));
+        updateSliderDisplay('foodRevenuePercent', 'foodRevenuePercentValue', (val) => val + '%');
+        updateSliderDisplay('beverageRevenuePercent', 'beverageRevenuePercentValue', (val) => val + '%');
+        updateSliderDisplay('revenueRetainedPercent', 'revenueRetainedPercentValue', (val) => val + '%');
+
+        // Navigation
+        document.getElementById('nextToSectionB')?.addEventListener('click', () => {
+            const form = document.getElementById('sectionA');
+            if (form.querySelector('form') || form.closest('form')) {
+                const formData = new FormData(document.getElementById('calculatorForm'));
+                if (formData.get('operationType') && formData.get('dailyCovers') && formData.get('averageCheck') && formData.get('daysOpen')) {
+                    goToStep(2);
+                } else {
+                    alert('Please fill in all required fields');
+                }
+            }
+        });
+
+        document.getElementById('nextToSectionC')?.addEventListener('click', () => {
+            goToStep(3);
+        });
+
+        document.getElementById('backToSectionA')?.addEventListener('click', () => goToStep(1));
+        document.getElementById('backToSectionB')?.addEventListener('click', () => goToStep(2));
+
+        // Calculations
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function animateCounter(element, startValue, endValue, duration) {
+            const startTime = performance.now();
+            const difference = endValue - startValue;
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (difference * easeOut);
+                element.textContent = formatCurrency(Math.round(currentValue));
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = formatCurrency(endValue);
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
+        function calculateResults() {
+            const formData = new FormData(document.getElementById('calculatorForm'));
+            
+            // Section A
+            const dailyCovers = parseFloat(formData.get('dailyCovers')) || 0;
+            const averageCheck = parseFloat(formData.get('averageCheck')) || 0;
+            const daysOpen = parseFloat(formData.get('daysOpen')) || 7;
+            const renovationWeeks = parseFloat(formData.get('renovationWeeks')) || 12;
+
+            // Section B
+            const foodRevenuePercent = parseFloat(formData.get('foodRevenuePercent')) || 70;
+            const beverageRevenuePercent = parseFloat(formData.get('beverageRevenuePercent')) || 30;
+            const cateringRevenue = parseFloat(formData.get('cateringRevenue')) || 0;
+            const revenueLostPercent = parseFloat(formData.get('revenueLostPercent')) || 100;
+
+            // Section C
+            const revenueRetainedPercent = parseFloat(formData.get('revenueRetainedPercent')) || 95;
+            const rentalCost = parseFloat(formData.get('rentalCost')) || 8500;
+            const includeSoftCosts = formData.get('includeSoftCosts') === 'on';
+
+            // Calculations
+            const dailyRevenue = dailyCovers * averageCheck;
+            const weeklyRevenue = dailyRevenue * daysOpen;
+            const monthlyCatering = cateringRevenue || 0;
+            const totalWeeklyRevenue = weeklyRevenue + (monthlyCatering / 4.33);
+            const revenueAtRisk = totalWeeklyRevenue * renovationWeeks;
+            const revenueLost = revenueAtRisk * (revenueLostPercent / 100);
+            const revenueRetained = revenueAtRisk * (revenueRetainedPercent / 100);
+            const totalRentalCost = (renovationWeeks / 4) * rentalCost;
+            const netRevenueProtected = revenueRetained - totalRentalCost;
+            
+            // Soft costs multiplier
+            let adjustedRevenueLost = revenueLost;
+            if (includeSoftCosts) {
+                adjustedRevenueLost = revenueLost * 1.15; // 15% multiplier
+            }
+
+            // ROI calculation
+            const roiRatio = totalRentalCost > 0 ? (netRevenueProtected / totalRentalCost).toFixed(1) : 0;
+
+            return {
+                revenueAtRisk,
+                revenueLost: adjustedRevenueLost,
+                revenueRetained,
+                netRevenueProtected,
+                totalRentalCost,
+                roiRatio,
+                renovationWeeks
+            };
+        }
+
+        // Store calculation results globally for detailed report
+        let currentCalculationResults = null;
+
+        // Form Submission
+        document.getElementById('calculatorForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const results = calculateResults();
+            currentCalculationResults = results; // Store for detailed report
+            
+            // Hide form, show results (blurred)
+            document.querySelector('.calculator-card-header').style.display = 'none'; // Hide main header
+            document.querySelector('.wizard-steps').style.display = 'none';
+            document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
+            const resultsState = document.getElementById('resultsState');
+            resultsState.classList.add('active', 'blurred');
+            
+            // Hide detailed report initially
+            document.getElementById('detailedReport').style.display = 'none';
+
+            // Animate results
+            animateCounter(document.getElementById('totalRiskAmount'), 0, results.revenueAtRisk, 2000);
+            animateCounter(document.getElementById('revenueLostAmount'), 0, results.revenueLost, 2000);
+            animateCounter(document.getElementById('revenueProtectedAmount'), 0, results.netRevenueProtected, 2000);
+            
+            document.getElementById('roiRatio').textContent = results.roiRatio;
+            document.getElementById('totalRiskDescription').textContent = 
+                `over ${results.renovationWeeks} ${results.renovationWeeks === 1 ? 'week' : 'weeks'}`;
+
+            // Show email modal immediately and scroll to top
+            setTimeout(() => {
+                // Scroll to top of page/iframe
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (window.parent !== window) {
+                    // If in iframe, try to scroll parent
+                    try {
+                        window.parent.scrollTo({ top: 0, behavior: 'smooth' });
+                    } catch (e) {
+                        // Cross-origin, can't scroll parent
+                    }
+                }
+                document.getElementById('emailModal').classList.add('active');
+            }, 500);
+
+            // Track GA4
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'calculator_submit', {
+                    'revenue_at_risk': results.revenueAtRisk,
+                    'revenue_lost': results.revenueLost,
+                    'revenue_protected': results.netRevenueProtected
+                });
+            }
+        });
+
+        // Recalculate
+        document.getElementById('recalculateBtn')?.addEventListener('click', () => {
+            document.getElementById('resultsState').classList.remove('active');
+            document.querySelector('.calculator-card-header').style.display = 'block'; // Show main header again
+            document.querySelector('.wizard-steps').style.display = 'flex';
+            currentStep = 1;
+            goToStep(1);
+            document.getElementById('calculatorForm').reset();
+            // Hide results header
+            document.getElementById('resultsHeader').style.display = 'none';
+        });
+
+        // Email Modal - prevent closing without email submission
+        document.getElementById('closeEmailModal')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Don't allow closing - user must submit email to see results
+            alert('Please enter your email to view the full results.');
+        });
+
+        document.getElementById('emailForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('userEmail').value;
+            
+            // Here you would send to your backend/CRM
+            console.log('Email captured:', email);
+            
+            // Remove blur from results
+            document.getElementById('resultsState').classList.remove('blurred');
+            
+            // Close modal
+            document.getElementById('emailModal').classList.remove('active');
+            
+            // Show detailed report
+            if (currentCalculationResults) {
+                displayDetailedReport(currentCalculationResults);
+            }
+            
+            // Track email capture
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'email_capture', {
+                    'email': email
+                });
+            }
+        });
+
+        function displayDetailedReport(results) {
+            // Show results header
+            document.getElementById('resultsHeader').style.display = 'block';
+            
+            const detailedReport = document.getElementById('detailedReport');
+            detailedReport.style.display = 'block';
+            
+            // Populate detailed report fields
+            const formData = new FormData(document.getElementById('calculatorForm'));
+            const dailyCovers = parseFloat(formData.get('dailyCovers')) || 0;
+            const averageCheck = parseFloat(formData.get('averageCheck')) || 0;
+            const daysOpen = parseFloat(formData.get('daysOpen')) || 7;
+            const dailyRevenue = dailyCovers * averageCheck;
+            const weeklyRevenue = dailyRevenue * daysOpen;
+            
+            document.getElementById('reportDailyRevenue').textContent = formatCurrency(dailyRevenue);
+            document.getElementById('reportWeeklyRevenue').textContent = formatCurrency(weeklyRevenue);
+            document.getElementById('reportRentalCost').textContent = formatCurrency(results.totalRentalCost);
+            document.getElementById('reportNetSavings').textContent = formatCurrency(results.netRevenueProtected);
+            
+            document.getElementById('breakdownRevenueAtRisk').textContent = formatCurrency(results.revenueAtRisk);
+            document.getElementById('breakdownRevenueLost').textContent = formatCurrency(results.revenueLost);
+            document.getElementById('breakdownRevenueRetained').textContent = formatCurrency(results.revenueRetained);
+            document.getElementById('breakdownKitchenCost').textContent = formatCurrency(results.totalRentalCost);
+            document.getElementById('breakdownNetProtected').textContent = formatCurrency(results.netRevenueProtected);
+            
+            // Keep page at top - no auto scroll down
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (window.parent !== window) {
+                try {
+                    window.parent.scrollTo({ top: 0, behavior: 'smooth' });
+                } catch (e) {
+                    // Cross-origin, can't scroll parent
+                }
+            }
+        }
+
+        // Auto-resize iframe
+        function resizeIframe() {
+            if (window.parent !== window) {
+                document.documentElement.classList.add('iframe-embedded');
+                
+                function getExactHeight() {
+                    const container = document.querySelector('.calculator-container');
+                    if (container) {
+                        const rect = container.getBoundingClientRect();
+                        return Math.ceil(rect.bottom + 1);
+                    }
+                    return Math.ceil(document.body.scrollHeight);
+                }
+                
+                function sendHeight() {
+                    window.parent.postMessage({
+                        type: 'resize',
+                        height: getExactHeight()
+                    }, '*');
+                }
+                
+                const resizeObserver = new ResizeObserver(sendHeight);
+                resizeObserver.observe(document.body);
+                if (document.querySelector('.calculator-container')) {
+                    resizeObserver.observe(document.querySelector('.calculator-container'));
+                }
+
+                setTimeout(sendHeight, 100);
+                setTimeout(sendHeight, 300);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', resizeIframe);
+        } else {
+            resizeIframe();
+        }
+    </script>
+</body>
+</html>
