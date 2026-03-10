@@ -928,6 +928,7 @@
                 <div class="email-input-group">
                     <input type="email" id="userEmail" name="email" placeholder="your.email@example.com" required>
                 </div>
+                <p id="hubspot-status" style="display: none; margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--color-gray);"></p>
                 <div class="button-group" style="margin-top: 0;">
                     <button type="submit" class="new-button" style="width: 100%;">
                         <div class="z-index-2">View Full Report</div>
@@ -1165,37 +1166,89 @@
             document.getElementById('resultsHeader').style.display = 'none';
         });
 
+        // HubSpot Form – Revenue Loss Calculator (portalId + form GUID)
+        const HUBSPOT_FORM = {
+            enabled: true,
+            portalId: '1790538',
+            formGuid: '8a7524b7-022c-4901-9591-27a545bfd14d',
+            gdprEnabled: false,
+            consentText: 'I agree to allow this site to store and process my personal data.'
+        };
+
+        function getCookieValue(name) {
+            const parts = (document.cookie || '').split(';');
+            const prefix = name + '=';
+            for (let part of parts) {
+                part = part.trim();
+                if (part.indexOf(prefix) === 0) return decodeURIComponent(part.slice(prefix.length));
+            }
+            return '';
+        }
+
+        function setHubSpotStatus(message) {
+            const el = document.getElementById('hubspot-status');
+            if (!el) return;
+            el.textContent = message || '';
+            el.style.display = message ? 'block' : 'none';
+        }
+
+        async function submitHubSpotForm({ email }) {
+            if (!HUBSPOT_FORM.enabled) return { success: false, error: 'HubSpot form disabled' };
+            if (!HUBSPOT_FORM.portalId || !HUBSPOT_FORM.formGuid) return { success: false, error: 'Missing HubSpot config' };
+
+            const endpoint = `https://api.hsforms.com/submissions/v3/integration/submit/${encodeURIComponent(HUBSPOT_FORM.portalId)}/${encodeURIComponent(HUBSPOT_FORM.formGuid)}`;
+            const payload = {
+                submittedAt: Date.now(),
+                fields: [{ name: 'email', value: email }],
+                context: {
+                    hutk: getCookieValue('hubspotutk') || undefined,
+                    pageUri: window.location.href,
+                    pageName: document.title
+                },
+                legalConsentOptions: HUBSPOT_FORM.gdprEnabled ? { consent: { consentToProcess: true, text: HUBSPOT_FORM.consentText || '' } } : undefined
+            };
+
+            try {
+                const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, mode: 'cors', body: JSON.stringify(payload) });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.message || err.errors?.[0]?.message || err.inlineMessage || `HubSpot error: ${response.status}`);
+                }
+                return { success: true };
+            } catch (err) {
+                console.error('HubSpot form submission failed:', err);
+                return { success: false, error: err.message };
+            }
+        }
+
         // Email Modal - prevent closing without email submission
         document.getElementById('closeEmailModal')?.addEventListener('click', (e) => {
             e.preventDefault();
-            // Don't allow closing - user must submit email to see results
             alert('Please enter your email to view the full results.');
         });
 
-        document.getElementById('emailForm')?.addEventListener('submit', (e) => {
+        document.getElementById('emailForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('userEmail').value;
-            
-            // Here you would send to your backend/CRM
-            console.log('Email captured:', email);
-            
-            // Remove blur from results
+            const emailInput = document.getElementById('userEmail');
+            const email = emailInput ? emailInput.value.trim() : '';
+            if (!email) {
+                setHubSpotStatus('Please enter a valid email address.');
+                return;
+            }
+
+            setHubSpotStatus('Submitting…');
+            const result = await submitHubSpotForm({ email });
+
+            if (!result.success) {
+                setHubSpotStatus('Couldn’t submit: ' + (result.error || 'Unknown error'));
+                return;
+            }
+
+            setHubSpotStatus('Submitted.');
             document.getElementById('resultsState').classList.remove('blurred');
-            
-            // Close modal
             document.getElementById('emailModal').classList.remove('active');
-            
-            // Show detailed report
-            if (currentCalculationResults) {
-                displayDetailedReport(currentCalculationResults);
-            }
-            
-            // Track email capture
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'email_capture', {
-                    'email': email
-                });
-            }
+            if (currentCalculationResults) displayDetailedReport(currentCalculationResults);
+            if (typeof gtag !== 'undefined') gtag('event', 'email_capture', { email: email });
         });
 
         function displayDetailedReport(results) {
